@@ -1,4 +1,4 @@
-setwd("C:/Users/phoeb/OneDrive/Desktop/UNI/RESEARCH PROJECT/Data")
+setwd(file.path("~", "Downloads"))
 
 library(lubridate)
 library(mgcv)
@@ -12,6 +12,7 @@ library(scales)
 library(ggimage)
 library(activity)
 library(nlme)
+library(magick)
 
 # Initial steps ####
 #import data 
@@ -199,63 +200,6 @@ mact.u@pdf[,2] <- rescale(mact.u@pdf[,2], to = c(0, 1))
 mact.o@pdf[,2] <- rescale(mact.o@pdf[,2], to = c(0, 1))
 mact.t@pdf[,2] <- rescale(mact.t@pdf[,2], to = c(0, 1))
 
-# Mouse data -  Plotting overlap  ####
-dev.control(displaylist="enable")
-par(mar=c(5.1, 4.1, 4.1, 10.1), xpd=TRUE)
-par(family = 'sans')
-
-plot(mact.u, yunit="density", data="none", las=1, lwd=2, lty = 1,
-     tline=list(lwd=2, lty = 1), # Thick line 
-     cline=list(lty=0)) # Supress confidence intervals
-
-plot(mact.o, yunit="density", data="none", add=TRUE, 
-     tline=list(col="red", lwd=2, lty = 2),
-     cline=list(lty=0))
-
-plot(mact.t, yunit="density", data="none", add=TRUE, 
-     tline=list(col="blue", lwd=2, lty = 3),
-     cline=list(lty=0))
-
-legend("top", 
-       inset=c(-0.26,-0.16), 
-       c("Unboxed (U)", "Open box (O)", "Tube box (T)"), 
-       col=c(1,2,4), 
-       lty=c(1,2,3), 
-       lwd=2,
-       bty="n", 
-       horiz = T)
-
-mocorners <- par("usr")
-
-text(x = mocorners[2], y = mocorners[4]-0.0123, pos = 4,
-     bquote(bold("Overlap (" ~ Delta ~ ")")), xpd = T)
-text(x = mocorners[2], y = mocorners[4]-0.0243, pos = 4,
-     bquote("U-O" == .(round(mouse.uo[1], 2)) ~ "(P = " * .(round(1-mouse.uo[4], 3)) * ")"), xpd=T)
-text(x = mocorners[2], y = mocorners[4]-0.0363, pos = 4,
-     bquote("U-T" == .(round(mouse.ut[1], 2)) ~ "(P = " * .(round(1-mouse.ut[4], 3)) * ")"), xpd=T)
-text(x = mocorners[2], y = mocorners[4]-0.0483, pos = 4,
-     bquote("O-T" == .(round(mouse.ot[1], 2)) ~ "(P = 0.952)"), xpd=T)
-
-text(x = mocorners[2], y = mocorners[4]-0.0723, pos = 4, 
-     bquote(bold("Sample size (n)")), xpd = T)
-text(x = mocorners[2], y = mocorners[4]-0.0843, pos = 4,
-     bquote("U" == .(length(mact.u@data))))
-text(x = mocorners[2], y = mocorners[4]-0.0963, pos = 4, 
-     bquote("O" == .(length(mact.o@data))))
-text(x = mocorners[2], y = mocorners[4]-0.1083, pos = 4,
-     bquote("T" == .(length(mact.t@data))))
-
-grid::grid.raster(png::readPNG('mouse.png'), x = .87, y=0.25, width = .15) 
-
-text(x = mocorners[1]-2.75, y = mocorners[4]+.015, pos = 4, 
-     bquote(bold("a)")), xpd = T, cex = 1.2)
-
-mouse.activity.plot <- recordPlot()
-invisible(dev.off())
-
-png("mouse_activity.png", width = 8.5, height = 4.5, units = 'in', res = 300)
-mouse.activity.plot
-dev.off()
 
 # Vole data - activity and overlap calculations ####
 voct.u <- fitact((camdata$time_adj  * 2 * pi)[camdata$sp_group == 'vole' & camdata$camera == "no box"], #convert to radians
@@ -278,64 +222,6 @@ voct.u@pdf[,2] <- rescale(voct.u@pdf[,2], to = c(0, 1))
 voct.o@pdf[,2] <- rescale(voct.o@pdf[,2], to = c(0, 1))
 voct.t@pdf[,2] <- rescale(voct.t@pdf[,2], to = c(0, 1))
 
-# Vole data - Plotting overlap ####
-dev.control(displaylist="enable")
-par(mar=c(5.1, 4.1, 4.1, 10.1), xpd=TRUE)
-par(family = 'sans')
-
-plot(voct.u, yunit="density", data="none", las=1, lwd=2, lty = 1,
-     tline=list(lwd=2, lty = 1), # Thick line 
-     cline=list(lty=0))
-
-plot(voct.o, yunit="density", data="none", add=TRUE, 
-     tline=list(col="red", lwd=2, lty = 2),
-     cline=list(lty=0))
-
-plot(voct.t, yunit="density", data="none", add=TRUE, 
-     tline=list(col="blue", lwd=2, lty = 3),
-     cline=list(lty=0))
-
-legend("top", 
-       inset=c(-0.26,-0.16), 
-       c("Unboxed (U)", "Open box (O)", "Tube box (T)"), 
-       col=c(1,2,4), 
-       lty=c(1,2,3), 
-       lwd=2,
-       bty="n", 
-       horiz = T)
-
-vocorners <- par("usr")
-
-text(x = vocorners[2], y = vocorners[4]-0.0223, pos = 4,
-     bquote(bold("Overlap (" ~ Delta ~ ")")), xpd = T)
-text(x = vocorners[2], y = vocorners[4]-0.0423, pos = 4, 
-     bquote("U-O" == .(round(vole.uo[1], 2)) ~ "(P = " * .(round(vole.uo[4], 3)) * ")"), xpd=T)
-text(x = vocorners[2], y = vocorners[4]-0.0623, pos = 4, 
-     bquote("U-T" == .(format(round(vole.ut[1], digits = 2), nsmall = 2)) ~ "(P = " * .(round(vole.ut[4], 3)) * ")"), xpd=T)
-text(x = vocorners[2], y = vocorners[4]-0.0823, pos = 4,
-     bquote("O-T" == .(format(round(vole.ot[1], digits = 2), nsmall = 2)) ~ "(P = " * .(round(vole.ot[4], 3)) * ")"), xpd=T)
-
-text(x = vocorners[2], y = vocorners[4]-0.1223, pos = 4,
-     bquote(bold("Sample size (n)")), xpd = T)
-text(x = vocorners[2], y = vocorners[4]-0.1423, pos = 4,
-     bquote("U" == .(length(voct.u@data))))
-text(x = vocorners[2], y = vocorners[4]-0.1623, pos = 4, 
-     bquote("O" == .(length(voct.o@data))))
-text(x = vocorners[2], y = vocorners[4]-0.18223, pos = 4,
-     bquote("T" == .(length(voct.t@data))))
-
-grid::grid.raster(png::readPNG('vole.png'), x = .87, y=0.25, width = .15) 
-
-text(x = mocorners[1]-2.75, y = mocorners[4]+.135, pos = 4, 
-     bquote(bold("c)")), xpd = T, cex = 1.2)
-
-vole.activity.plot <- recordPlot()
-invisible(dev.off())
-
-png("vole_activity.png", width = 8.5, height = 4.5, units = 'in', res = 300)
-vole.activity.plot
-dev.off()
-
 # Shrew data - activity and overlap calculations ####
 shct.u <- fitact((camdata$time_adj  * 2 * pi)[camdata$sp_group == 'shrew' & camdata$camera == "no box"], #convert to radians
                  sample = "model", reps = 1000)
@@ -357,206 +243,165 @@ shct.u@pdf[,2] <- rescale(shct.u@pdf[,2], to = c(0, 1))
 shct.o@pdf[,2] <- rescale(shct.o@pdf[,2], to = c(0, 1))
 shct.t@pdf[,2] <- rescale(shct.t@pdf[,2], to = c(0, 1))
 
-# Shrew data - Plotting overlaps #### 
-dev.control(displaylist="enable")
-par(mar=c(5.1, 4.1, 4.1, 10.1), xpd=TRUE)
-par(family = 'sans')
-
-plot(shct.u, yunit="density", data="none", las=1, lwd=2, lty = 1,
-     tline=list(lwd=2, lty = 1), # Thick line 
-     cline=list(lty=0)) # Supress confidence intervals
-
-plot(shct.o, yunit="density", data="none", add=TRUE, 
-     tline=list(col="red", lwd=2, lty = 2),
-     cline=list(lty=0))
-
-plot(shct.t, yunit="density", data="none", add=TRUE, 
-     tline=list(col="blue", lwd=2, lty = 3),
-     cline=list(lty=0))
-
-legend("top", 
-       inset=c(-0.26,-0.16), 
-       c("Unboxed (U)", "Open box (O)", "Tube box (T)"), 
-       col=c(1,2,4), 
-       lty=c(1,2,3), 
-       lwd=2,
-       bty="n", 
-       horiz = T)
-
-shcorners <- par("usr")
-
-text(x = shcorners[2], y = shcorners[4]-0.0223, pos = 4,
-     bquote(bold("Overlap (" ~ Delta ~ ")")), xpd = T)
-text(x = shcorners[2], y = shcorners[4]-0.0423, pos = 4,
-     bquote("U-O" == .(round(shrew.uo[1], 2)) ~ "(P < 0.001)"), xpd=T)
-text(x = shcorners[2], y = shcorners[4]-0.0623, pos = 4,
-     bquote("U-T" == .(format(round(shrew.ut[1], digits = 2), nsmall = 2)) ~ "(P < 0.001)"), xpd=T)
-text(x = shcorners[2], y = shcorners[4]-0.0823, pos = 4, 
-     bquote("O-T" == .(format(round(shrew.ot[1], digits = 2), nsmall = 2)) ~ "(P < 0.001)"), xpd=T)
-
-text(x = shcorners[2], y = shcorners[4]-0.1223, pos = 4,
-     bquote(bold("Sample size (n)")), xpd = T)
-text(x = shcorners[2], y = shcorners[4]-0.1423, pos = 4,
-     bquote("U" == .(length(shct.u@data))))
-text(x = shcorners[2], y = shcorners[4]-0.1623, pos = 4,
-     bquote("O" == .(length(shct.o@data))))
-text(x = shcorners[2], y = shcorners[4]-0.1823, pos = 4,
-     bquote("T" == .(length(shct.t@data))))
-
-grid::grid.raster(png::readPNG('shrew.png'), x = .87, y=0.25, width = .15) 
-
-text(x = mocorners[1]-2.75, y = mocorners[4]+.135, pos = 4, 
-     bquote(bold("b)")), xpd = T, cex = 1.2)
-
-shrew.activity.plot <- recordPlot()
-invisible(dev.off())
-
-png("shrew_activity.png", width = 8.5, height = 4.5, units = 'in', res = 300)
-shrew.activity.plot
-dev.off()
-
-# Save/load image #####
-#save.image(file='myEnvironment.RData')
-load(file='myEnvironment.RData')
-
-# Latency to first detection ####
-# extract min and max dates for each species group and station
-min_max <- camdata %>%
-  group_by(station, camera) %>%
-  summarize(min_date = min(date.time, na.rm=T),
-            max_date = max(date.time, na.rm=T))
-
-# create columns for set date and retrieval date
-min_max$set_date <- as.POSIXct(paste(as.character(date(min_max$min_date)-1), "18:00:00", sep =  " "), format = "%Y-%m-%d %H:%M:%S")
-min_max$col_date <- as.POSIXct(paste(as.character(date(min_max$max_date)+1), "18:00:00", sep =  " "), format = "%Y-%m-%d %H:%M:%S")
-
-# Create all sequences based on min_max dates
-seq_list <- list()
-for(i in 1:nrow(min_max)) {
-  seq_list[[i]] <- data.frame(date = seq(min_max$set_date[[i]], min_max$col_date[[i]], by = "hour"))
-  # do stuff with row
+# Standardised activity-overlap panel plot function
+# 
+# Draws:
+# main plot, rug plot
+# Right margin, top to bottom: legend, overlap stats, sample sized
+# Bottom right: species silhouette
+plot_activity_panel <- function(models,                     # list(u=, o=, t=) overlap::activity fits
+                                dhat,                       # list(uo=, ut=, ot=), each vector where [1] = Dhat
+                                panel_letter,                # "a)", "b)", "c)" ...
+                                line_col = c("black", "red", "blue"),
+                                line_lty = c(1, 2, 3),
+                                legend_labels = c("Unboxed (U)", "Open box (O)", "Tube box (T)"),
+                                comparison_labels = c("U-O", "U-T", "O-T"),
+                                line_spacing_mult = 1.8,     # line pitch, as a multiple of one text line's natural height
+                                letter_x_offset = -2.75,     # in x-axis units (hours), same scale for all panels
+                                letter_y_frac = 0.03,        # letter offset above plot, as fraction of y-range
+                                legend_y_intersp = 1.4) {    # vertical spacing between legend rows
+  
+  fmt_d <- function(d) format(round(d, 2), nsmall = 2)
+  
+  layout(matrix(c(1, 2), ncol = 1), heights = c(4.5, 1))
+  par(mar = c(4.1, 4.1, 2, 10.1), xpd = TRUE, bg = "white", family = "sans")
+  
+  plot(models$u, yunit = "density", data = "none", las = 1, lwd = 2, lty = line_lty[1],
+       tline = list(lwd = 2, lty = line_lty[1]),
+       cline = list(lty = 0))
+  plot(models$o, yunit = "density", data = "none", add = TRUE,
+       tline = list(col = line_col[2], lwd = 2, lty = line_lty[2]),
+       cline = list(lty = 0))
+  plot(models$t, yunit = "density", data = "none", add = TRUE,
+       tline = list(col = line_col[3], lwd = 2, lty = line_lty[3]),
+       cline = list(lty = 0))
+  
+  corners <- par("usr") 
+  
+  # Legend
+  leg <- legend(x = corners[2], y = corners[4], xjust = 0, yjust = 1,
+                legend_labels, col = c(1, 2, 4), lty = line_lty, lwd = 2, bty = "n",
+                y.intersp = legend_y_intersp)
+  legend_bottom <- corners[4] - leg$rect$h
+  
+  line_height_actual <- graphics::strheight("Xg", cex = par("cex")) * line_spacing_mult
+  
+  overlap_top <- legend_bottom - line_height_actual   # small gap below the legend
+  y_at <- function(i) overlap_top - (i - 1) * line_height_actual
+  
+  # Overlap block
+  text(x = corners[2], y = y_at(1), pos = 4, bquote(bold("Overlap (" ~ Delta ~ ")")), xpd = TRUE)
+  text(x = corners[2], y = y_at(2), pos = 4,
+       bquote(.(comparison_labels[1]) == .(fmt_d(dhat$uo[1]))), xpd = TRUE)
+  text(x = corners[2], y = y_at(3), pos = 4,
+       bquote(.(comparison_labels[2]) == .(fmt_d(dhat$ut[1]))), xpd = TRUE)
+  text(x = corners[2], y = y_at(4), pos = 4,
+       bquote(.(comparison_labels[3]) == .(fmt_d(dhat$ot[1]))), xpd = TRUE)
+  
+  # line 5 left blank as a section gap
+  text(x = corners[2], y = y_at(6), pos = 4, bquote(bold("Sample size (n)")), xpd = TRUE)
+  text(x = corners[2], y = y_at(7), pos = 4, bquote("U" == .(length(models$u@data))), xpd = TRUE)
+  text(x = corners[2], y = y_at(8), pos = 4, bquote("O" == .(length(models$o@data))), xpd = TRUE)
+  text(x = corners[2], y = y_at(9), pos = 4, bquote("T" == .(length(models$t@data))), xpd = TRUE)
+  
+  text(x = corners[1] + letter_x_offset,
+       y = corners[4] + letter_y_frac * (corners[4] - corners[3]),
+       pos = 4, bquote(bold(.(panel_letter))), xpd = TRUE, cex = 1.2)
 }
 
-b <- c(paste0("m", a, sep = ""), paste0("s", a, sep = ""), paste0("v", a, sep = ""))
-names(seq_list) <- paste(substr(min_max$camera, 1,1), min_max$station, sep = "")
-seq_cams <- bind_rows(seq_list, .id = "cams") # Collapse list to single data frame
-
-# create camera and station columns for merging
-names(seq_cams)[names(seq_cams) == "date"] <- "date.time"
-seq_cams$station <- as.vector(unlist(lapply(strsplit(seq_cams$cams, ""), `[`, 2)))
-seq_cams$camera <- as.vector(unlist(lapply(strsplit(seq_cams$cams, ""), `[`, 1)))
-seq_cams$camera[seq_cams$camera  == "n"] <- "no box" 
-seq_cams$camera[seq_cams$camera  == "o"] <- "open box"
-seq_cams$camera[seq_cams$camera  == "t"] <- "tube box"
+add_bottom_right_silhouette <- function(silhouette_png, width_frac = 0.9, x_pad_frac = 0) {
+  # Anchors a silhouette to the bottom-right corner of the most recent panel
+  #
+  # x_pad_frac = fraction of the right-margin width to leave as empty space
+  # between the silhouette and the true right-hand edge (0 = flush against
+  # the edge; increase to shunt it left off the edge, e.g. 0.05).
+  corners <- par("usr")             # xmin, xmax, ymin, ymax of the active panel
+  pin <- par("pin")                 # plot region size, inches (w, h)
+  right_margin_in <- par("mai")[4]  # right margin width of the active panel, inches
   
-
-# combine with camdata, keeping all rows
-sm.cams <- merge(camdata, seq_cams, by = c("camera", "station", "date.time"), 
-                 all = T) 
-
-# Change NA presence to 0
-sm.cams$count[is.na(sm.cams$count)] <- 0
-
-# Split by camera type
-cam.split <- sm.cams %>% 
-  group_by(camera, station) %>%
-  arrange(date,time) %>% 
-  ungroup() %>%
-  group_split(camera, station) %>%
-  set_names("n1", "n2", "n4", "n6", "o1", "o2", "o3", "o4", "o5", "o6", "t2", "t3", "t4", "t5", "t6")
+  img <- png::readPNG(silhouette_png)
+  aspect <- dim(img)[1] / dim(img)[2]   # height/width in pixels, to preserve on resize
   
-cam.split <- lapply(cam.split, function(df) df[order(df$date.time),])
-
-# Function to randomly sample data according to null followed by detection
-smoot <- function(df){
-  df$time2 <- strftime(df$date.time, '%H:%M:%S')
-  d <- df[sample(which(df$count == 0 & 
-                                   (as.POSIXct(df$time2, format = "%H:%M:%S") <= format(as.POSIXct("18:00:00", format = "%H:%M:%S")) |
-                                    as.POSIXct(df$time2, format = "%H:%M:%S") >= format(as.POSIXct("07:00:00", format = "%H:%M:%S")))), 
-                           1), ] # randomly sample row with count == 0 and between 07:00 and 18:00
-  e <- df[df$date.time > d$date.time & 
-                                df$count == 1, ] # find next instance of species detection
+  width_in  <- right_margin_in * width_frac
+  height_in <- width_in * aspect
   
-  if (nrow(e) == 0) {
-    # No matching e found
-    return(NULL)
-  }
+  # convert inches to this panel's user units
+  in_to_user_x <- (corners[2] - corners[1]) / pin[1]
+  in_to_user_y <- (corners[4] - corners[3]) / pin[2]
   
-  e <- e[1,] # take the first row
-  f <- as.numeric(difftime(e$date.time, d$date.time), "hours") # Calculate time between detections
+  width_user  <- width_in  * in_to_user_x
+  height_user <- height_in * in_to_user_y
   
-  if (is.na(f) || length(f) == 0) {
-    return(NULL)
-  }
+  margin_user   <- right_margin_in * in_to_user_x
+  right_edge    <- corners[2] + margin_user
+  xright        <- right_edge - (right_margin_in * x_pad_frac * in_to_user_x)
+  xleft         <- xright - width_user
   
-  return(data.frame(set = d$date.time, detection = e$date.time, diff = f))
-  }
-
-# Test function
-p <- smoot(cam.split$n1)
-
-# Repeat N times
-n_replicates <- 1000  # Number of replicates
-set.seed(1507)
-final_df <- map_df(1:n_replicates, ~ smoot(cam.split$n1)) 
-final_df2 <- final_df %>% distinct(set, detection) # remove duplicates
-
-# Run across all data frames
-set.seed(1308)
-stat.boot <- lapply(cam.split, function(x) map_df(1:n_replicates, ~ smoot(x)))
-  
-#  Remove duplicates across list of data frames based on specific columns
-columns_to_check <- c("set", "detection")
-
-stat.boot2 <- stat.boot %>%
-  bind_rows(.id = "source") %>%    # Combine all data frames with an identifier column for splitting
-  distinct(across(all_of(columns_to_check)), .keep_all = TRUE) %>%  # Remove duplicates based on specified columns
-  group_split(source)  # Split back into the list of data frames by the original source
-
-# Convert to data frame and prepare for plotting
-stat.df <- do.call(rbind.data.frame, stat.boot2)
-stat.df$cam_type[substr(stat.df$source, 1, 1) == "n"] <- "Unboxed"
-stat.df$cam_type[substr(stat.df$source, 1, 1) == "o"] <- "Open box"
-stat.df$cam_type[substr(stat.df$source, 1, 1) == "t"] <- "Tube box"
-stat.df$station <- as.factor(substr(stat.df$source, 2, 2))
-
-latency.data <- stat.df %>% group_by(cam_type) %>%
-  summarise(m = mean(diff, na.rm = T),
-            sd = sd(diff, na.rm = T),
-            se = sd(diff, na.rm = T)/sqrt(length(diff)))
-
-# ggplot theme
-theme_ac1 <- function(base_family = "serif", base_size_a = 12, base_size_t = 12){
-  theme_bw(base_family = base_family) %+replace%
-    theme(
-      plot.background = element_blank(),
-      panel.grid = element_blank(),   
-      axis.text = element_text(size = base_size_a),
-      axis.title = element_text(size=base_size_t,face="bold"),
-      legend.key=element_rect(colour=NA, fill =NA),
-      panel.border = element_rect(fill = NA, colour = "black", linewidth = 0),
-      panel.background = element_rect(fill = "white", colour = "black"), 
-      strip.background = element_rect(fill = NA)
-    )
+  rasterImage(img,
+              xleft   = xleft,
+              ybottom = corners[3],
+              xright  = xright,
+              ytop    = corners[3] + height_user,
+              xpd = TRUE)
 }
 
-# Plot
-latency.plot <- ggplot(latency.data, aes(cam_type, m)) +
-  geom_point() +
-  geom_errorbar(aes(ymin=m-se, ymax=m+se), width=.2,
-                position=position_dodge(.9)) +
-  theme_ac1() +
-  ylab("Hours before detection") +
-  xlab("Camera trap build")
 
-# Save plot
-png("latency_plot.png", width = 4.5, height = 4.5, units = 'in', res = 300)
-latency.plot
-dev.off()
+save_activity_panel <- function(panel_expr, rug_expr, silhouette_png, filename,
+                                width = 8.5, height = 4.5, res = 300,
+                                silhouette_width_frac = 0.75) {
+  png(filename, width = width, height = height, units = "in", res = res, bg = "white")
+  panel_expr()
+  rug_expr()
+  add_bottom_right_silhouette(silhouette_png, width_frac = silhouette_width_frac)
+  dev.off()
+}
 
-# Kruskal-Wallis test (can't normalise residuals to an acceptable level)
-kruskal.test(diff ~ as.factor(cam_type), data = stat.df)
+# Mouse panel
+save_activity_panel(
+  panel_expr = function() plot_activity_panel(
+    models = list(u = mact.u, o = mact.o, t = mact.t),
+    dhat   = list(uo = mouse.uo, ut = mouse.ut, ot = mouse.ot),
+    panel_letter = "a)"
+  ),
+  rug_expr = function() plot_rugs(mact.u, mact.o, mact.t),
+  silhouette_png = "mouse.png",
+  filename = "mouse_activity_proof.png"
+)
 
-# Pairwise Wilcox test
-pairwise.wilcox.test(stat.df$diff, stat.df$cam_type,
-                     p.adjust.method = "BH")
+# Vole panel
+save_activity_panel(
+  panel_expr = function() plot_activity_panel(
+    models = list(u = voct.u, o = voct.o, t = voct.t),
+    dhat   = list(uo = vole.uo, ut = vole.ut, ot = vole.ot),
+    panel_letter = "c)"
+  ),
+  rug_expr = function() plot_rugs(voct.u, voct.o, voct.t),
+  silhouette_width_frac = 0.55,
+  silhouette_png = "vole.png",
+  filename = "vole_activity_proof.png"
+)
+
+# Shrew panel
+save_activity_panel(
+  panel_expr = function() plot_activity_panel(
+    models = list(u = shct.u, o = shct.o, t = shct.t),
+    dhat   = list(uo = shrew.uo, ut = shrew.ut, ot = shrew.ot),
+    panel_letter = "b)"
+  ),
+  rug_expr = function() plot_rugs(shct.u, shct.o, shct.t),
+  silhouette_width_frac = 0.55,
+  silhouette_png = "shrew.png",
+  filename = "shrew_activity_proof.png"
+)
+
+
+# Combine into a single a-b-c stacked figure
+panels <- image_read(c(
+  "mouse_activity_proof.png",   # a)
+  "shrew_activity.png",         # b)
+  "vole_activity.png"           # c)
+))
+
+combined <- image_append(panels, stack = TRUE)
+image_write(combined, path = "activity_panels_combined.png")
+
